@@ -2,9 +2,10 @@ import { studentsService } from "../../../lib/firebase";
 import type { Student } from "../../../lib/types";
 import { notFound } from "next/navigation";
 
-// 推奨される型定義
+// Vercelのビルド環境に対応した、より厳密な型定義
 type PageProps = {
   params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export default async function StudentDetailPage({ params }: PageProps) {
