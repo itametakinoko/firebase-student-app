@@ -1,6 +1,8 @@
 import StudentDetailView from '@/components/StudentDetailView';
 
-// このページはidを受け取り、クライアントコンポーネントに渡すだけのシンプルな構造です
-export default function StudentDetailPage({ params }: { params: { id: string } }) {
-  return <StudentDetailView id={params.id} />;
+// 型定義を完全に削除
+export default function StudentDetailPage(props: any) {
+  // idの取得方法もpropsから直接取得
+  const id = props?.params?.id;
+  return <StudentDetailView id={id} />;
 }
