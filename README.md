@@ -1,3 +1,45 @@
+# Firebase 学生管理アプリ
+
+## セットアップ手順
+
+1. Firebaseコンソールで新規プロジェクトを作成し、Firestoreを有効化してください。
+2. 「プロジェクト設定」→「ウェブアプリ追加」→SDKスニペットから下記情報を取得し、プロジェクトルートの`.env.local`に記載してください。
+
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=xxxx
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxxx.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxxx.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxxx
+NEXT_PUBLIC_FIREBASE_APP_ID=xxxx
+```
+
+3. 依存パッケージをインストール
+
+```
+npm install firebase
+```
+
+4. Next.jsアプリを起動
+
+```
+npm run dev
+```
+
+---
+
+## 機能
+- 学生情報の登録（画像アップロード対応、Base64で保存）
+- 条件検索（名前・入学年度）
+- 学生リスト表示
+
+---
+
+## 拡張方法
+- 型定義（lib/types.ts）に項目を追加
+- サービス層（lib/firebase.ts）のwhere句生成部分に条件を追加
+- UIコンポーネントに入力欄を追加
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
