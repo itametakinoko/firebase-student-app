@@ -2,13 +2,7 @@ import { studentsService } from "../../../lib/firebase";
 import type { Student } from "../../../lib/types";
 import { notFound } from "next/navigation";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function StudentDetailPage({ params }: Props) {
+export default async function StudentDetailPage({ params }: { params: { id: string } }) {
   // FirestoreのドキュメントIDで直接取得
   const student: Student | null = await studentsService.getStudentByDocId(params.id);
 
