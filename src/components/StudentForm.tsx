@@ -1,7 +1,7 @@
 'use client';
 import { useState } from "react";
-import { studentsService } from "../lib/firebase";
-import type { Department, Course } from "../lib/types";
+import { studentsService } from "@/lib/firebase";
+import type { Department, Course } from "@/lib/types";
 
 const DEPARTMENTS: Department[] = [
   "経営学科",

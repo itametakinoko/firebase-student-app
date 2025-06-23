@@ -1,5 +1,5 @@
-import StudentForm from "../../components/StudentForm";
-import "../../styles/globals.css";
+import StudentForm from "@/components/StudentForm";
+import "@/styles/globals.css";
 
 export default function RegisterPage() {
   return (
