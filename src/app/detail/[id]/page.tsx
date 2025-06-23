@@ -1,7 +1,6 @@
 import StudentDetailView from '@/components/StudentDetailView';
 
-// The page component is now a simple, non-async component
+// このページはidを受け取り、クライアントコンポーネントに渡すだけのシンプルな構造です
 export default function StudentDetailPage({ params }: { params: { id: string } }) {
-  // It renders the client component and passes the id
   return <StudentDetailView id={params.id} />;
 }
