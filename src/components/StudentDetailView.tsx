@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { studentsService } from '../../lib/firebase';
-import type { Student } from '../../lib/types';
+import { studentsService } from '@/lib/firebase';
+import type { Student } from '@/lib/types';
 
 export default function StudentDetailView({ id }: { id: string }) {
   const [student, setStudent] = useState<Student | null>(null);
