@@ -2,12 +2,13 @@ import { studentsService } from "../../../lib/firebase";
 import type { Student } from "../../../lib/types";
 import { notFound } from "next/navigation";
 
-// カスタムのPagePropsを廃止し、Next.jsの標準的な型定義に変更
-export default async function StudentDetailPage({
-  params,
-}: {
+// Vercelのビルドエラーを解消するための、最も厳格で完全な型定義
+type Props = {
   params: { id: string };
-}) {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default async function StudentDetailPage({ params }: Props) {
   const student: Student | null = await studentsService.getStudentByDocId(
     params.id
   );
