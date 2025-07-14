@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import type { AISearchResult } from '@/lib/aiSearchService';
 
 interface AISearchResultsProps {
-  results: AISearchResult[];
+  results: any[]; // Changed from AISearchResult to any[] as AISearchResult is removed
   isLoading?: boolean;
   query?: string;
 }
@@ -91,7 +90,7 @@ export default function AISearchResults({ results, isLoading = false, query }: A
               <div className="flex items-center mb-2">
                 <span className="text-sm font-medium text-gray-700 mr-2">コース:</span>
                 <div className="flex flex-wrap gap-1">
-                  {result.student.courses.map((course, courseIndex) => (
+                  {result.student.courses.map((course: any, courseIndex: any) => (
                     <span
                       key={courseIndex}
                       className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
@@ -103,11 +102,11 @@ export default function AISearchResults({ results, isLoading = false, query }: A
               </div>
             </div>
 
-            {result.reasons.length > 0 && (
+            {result.reasons && result.reasons.length > 0 && (
               <div className="mb-3">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">マッチ理由:</h4>
                 <ul className="space-y-1">
-                  {result.reasons.map((reason, reasonIndex) => (
+                  {result.reasons.map((reason: any, reasonIndex: any) => (
                     <li key={reasonIndex} className="text-sm text-gray-600 flex items-start">
                       <span className="text-green-500 mr-2">✓</span>
                       {reason}
