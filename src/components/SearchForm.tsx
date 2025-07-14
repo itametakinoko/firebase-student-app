@@ -37,15 +37,23 @@ export default function SearchForm({ onResults }: { onResults?: (results: Studen
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filters: any = {};
-    if (name) filters.name = name;
-    if (department) filters.department = department;
-    if (admissionYear) filters.admissionYear = Number(admissionYear);
-    if (selectedCourses.length > 0) filters.courses = selectedCourses;
-    const found = await studentsService.searchStudents(filters);
+    // 検索条件を使って全件取得
+    const found = await studentsService.searchStudents();
     let filtered = found;
+    if (name) {
+      filtered = filtered.filter(s => s.name && s.name.includes(name));
+    }
     if (studentId) {
-      filtered = filtered.filter(s => s.id && s.id.startsWith(studentId));
+      filtered = filtered.filter(s => s.studentId && s.studentId.includes(studentId));
+    }
+    if (department) {
+      filtered = filtered.filter(s => s.department === department);
+    }
+    if (admissionYear) {
+      filtered = filtered.filter(s => s.admissionYear === Number(admissionYear));
+    }
+    if (selectedCourses.length > 0) {
+      filtered = filtered.filter(s => s.courses && selectedCourses.every(c => (s.courses as string[]).includes(c)));
     }
     if (sort === '学年順') {
       filtered = filtered.slice().sort((a, b) => (a.admissionYear || 0) - (b.admissionYear || 0));

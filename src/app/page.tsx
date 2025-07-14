@@ -35,51 +35,11 @@ export default function HomePage() {
           🎓 学生管理システム
         </h1>
 
-        {/* タブ切り替え */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-1">
-            <button
-              onClick={() => setActiveTab('text')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'text'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              📝 テキスト検索
-            </button>
-            <button
-              onClick={() => setActiveTab('image')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'image'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              🤖 顔認識検索
-            </button>
-          </div>
+        {/* テキスト検索のみ表示 */}
+        <div className="space-y-6">
+          <SearchForm onResults={setResults} />
+          <StudentList students={results} />
         </div>
-
-        {/* 検索フォーム */}
-        {activeTab === 'text' ? (
-          <div className="space-y-6">
-            <SearchForm onResults={setResults} />
-            <StudentList students={results} />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <ImageSearchForm 
-              onSearchResults={handleImageSearchResults}
-              onLoading={handleImageLoading}
-            />
-            <ImageSearchResults 
-              results={imageResults}
-              loading={imageLoading}
-              onStudentClick={handleStudentClick}
-            />
-          </div>
-        )}
       </div>
     </main>
   );
