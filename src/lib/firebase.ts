@@ -1,5 +1,6 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "firebase/auth";
 import type { Student, StudentSearchFilters, Department, Course } from "./types";
 
 const firebaseConfig = {
@@ -13,6 +14,7 @@ const firebaseConfig = {
 if (!getApps().length) initializeApp(firebaseConfig);
 
 const db = getFirestore();
+const auth = getAuth();
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -98,5 +100,33 @@ export const studentsService = {
       courses: data.courses,
       avatarUrl: data.avatarUrl,
     };
+  },
+  async updateStudent(id: string, data: Partial<Student>): Promise<void> {
+    const docRef = doc(db, "students", id);
+    await updateDoc(docRef, data);
+  },
+  async deleteStudent(id: string): Promise<void> {
+    const docRef = doc(db, "students", id);
+    await deleteDoc(docRef);
+  },
+  async registerWithEmail(email: string, password: string) {
+    await createUserWithEmailAndPassword(auth, email, password);
+  },
+  async loginWithEmail(email: string, password: string) {
+    await signInWithEmailAndPassword(auth, email, password);
+  },
+  async logout() {
+    await signOut(auth);
+  },
+  getCurrentUser() {
+    return auth.currentUser;
+  },
+  onAuthStateChanged(callback: (user: any) => void) {
+    return onAuthStateChanged(auth, callback);
+  },
+  async deleteCurrentUser() {
+    if (auth.currentUser) {
+      await deleteUser(auth.currentUser);
+    }
   },
 }; 

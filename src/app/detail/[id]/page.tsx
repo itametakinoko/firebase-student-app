@@ -1,8 +1,7 @@
 import StudentDetailView from '@/components/StudentDetailView';
 
-// 型定義を完全に削除
-export default function StudentDetailPage(props: any) {
-  // idの取得方法もpropsから直接取得
-  const id = props?.params?.id;
+// Next.js 15の新しい非同期パラメータ取得方式
+export default async function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return <StudentDetailView id={id} />;
 }

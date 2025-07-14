@@ -1,14 +1,16 @@
 'use client';
 import { useState } from "react";
 import { studentsService } from "@/lib/firebase";
-import type { StudentSearchFilters, Student, Department, Course } from "@/lib/types";
+import type { Student } from "@/lib/types";
 
-const DEPARTMENTS: Department[] = [
+const SORT_OPTIONS = ["50音順", "学年順", "新着順"];
+const YEARS = Array.from({ length: 8 }, (_, i) => new Date().getFullYear() - i);
+const DEPARTMENTS = [
   "経営学科",
   "ビジネスエコノミクス学科",
   "国際デザイン経営学科",
 ];
-const COURSES: Course[] = [
+const COURSES = [
   "経営学入門",
   "統計学入門",
   "データ分析",
@@ -18,13 +20,15 @@ const COURSES: Course[] = [
 
 export default function SearchForm({ onResults }: { onResults?: (results: Student[]) => void }) {
   const [name, setName] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [department, setDepartment] = useState("");
   const [admissionYear, setAdmissionYear] = useState("");
-  const [department, setDepartment] = useState<Department | "">("");
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [sort, setSort] = useState(SORT_OPTIONS[0]);
   const [results, setResults] = useState<Student[]>([]);
 
-  const handleCourseChange = (course: Course) => {
-    setCourses(prev =>
+  const handleCourseChange = (course: string) => {
+    setSelectedCourses(prev =>
       prev.includes(course)
         ? prev.filter(c => c !== course)
         : [...prev, course]
@@ -33,64 +37,220 @@ export default function SearchForm({ onResults }: { onResults?: (results: Studen
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filters: StudentSearchFilters = {};
+    const filters: any = {};
     if (name) filters.name = name;
+    if (department) filters.department = department;
     if (admissionYear) filters.admissionYear = Number(admissionYear);
-    if (department) filters.department = department as Department;
-    if (courses.length > 0) filters.courses = courses;
+    if (selectedCourses.length > 0) filters.courses = selectedCourses;
     const found = await studentsService.searchStudents(filters);
-    setResults(found);
-    onResults?.(found);
+    let filtered = found;
+    if (studentId) {
+      filtered = filtered.filter(s => s.id && s.id.startsWith(studentId));
+    }
+    if (sort === '学年順') {
+      filtered = filtered.slice().sort((a, b) => (a.admissionYear || 0) - (b.admissionYear || 0));
+    } else if (sort === '新着順') {
+      filtered = filtered.slice().sort((a, b) => (b.admissionYear || 0) - (a.admissionYear || 0));
+    } else if (sort === '50音順') {
+      filtered = filtered.slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+    setResults(filtered);
+    onResults?.(filtered);
   };
 
   return (
-    <div style={{ background: '#fff', padding: 16, borderRadius: 12, boxShadow: '0 2px 8px #0001', marginBottom: 24 }}>
-      <form onSubmit={handleSearch} style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
-        <div>
-          <label>名前<br />
-            <input value={name} onChange={e => setName(e.target.value)} style={{ width: 120 }} />
-          </label>
-        </div>
-        <div>
-          <label>入学年度<br />
-            <input type="number" value={admissionYear} onChange={e => setAdmissionYear(e.target.value)} style={{ width: 100 }} />
-          </label>
-        </div>
-        <div>
-          <label>学科<br />
-            <select value={department} onChange={e => setDepartment(e.target.value as Department | "")} style={{ width: 160 }}>
-              <option value="">指定なし</option>
-              {DEPARTMENTS.map(dep => (
-                <option key={dep} value={dep}>{dep}</option>
-              ))}
+    <div style={containerStyle}>
+      <form onSubmit={handleSearch} style={formRowStyle}>
+        <div style={rowStyle}>
+          <div style={inputGroupStyle}>
+            <span style={iconStyle}>
+              <svg width="20" height="20" fill="none" stroke="#888" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+            </span>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="名前"
+              style={inputStyle}
+            />
+          </div>
+          <div style={inputGroupStyle}>
+            <input
+              type="text"
+              value={studentId}
+              onChange={e => setStudentId(e.target.value)}
+              placeholder="学籍番号"
+              style={inputStyle}
+            />
+          </div>
+          <div style={inputGroupStyle}>
+            <select
+              value={department}
+              onChange={e => setDepartment(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">学科</option>
+              {DEPARTMENTS.map(dep => <option key={dep} value={dep}>{dep}</option>)}
             </select>
-          </label>
+          </div>
+          <div style={inputGroupStyle}>
+            <select
+              value={admissionYear}
+              onChange={e => setAdmissionYear(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">入学年度</option>
+              {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+          <select value={sort} onChange={e => setSort(e.target.value)} style={sortSelectStyle}>
+            {SORT_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+          <button type="submit" style={searchBtnStyle}>検索</button>
         </div>
-        <div>
-          <label>履修授業<br /></label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        <div style={coursesGroupStyle}>
+          <div style={coursesLabelStyle}>履修授業</div>
+          <div style={coursesCheckboxesStyle}>
             {COURSES.map(course => (
-              <label key={course} style={{ display: 'flex', alignItems: 'center', gap: 2, background: '#f5f5f5', borderRadius: 6, padding: '2px 6px' }}>
+              <label key={course} style={checkboxLabelStyle}>
                 <input
                   type="checkbox"
-                  checked={courses.includes(course)}
+                  checked={selectedCourses.includes(course)}
                   onChange={() => handleCourseChange(course)}
+                  style={checkboxStyle}
                 />
-                {course}
+                <span>{course}</span>
               </label>
             ))}
           </div>
         </div>
-        <button type="submit" style={{ padding: '6px 18px', background: '#2a4d7a', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 'bold' }}>検索</button>
       </form>
-      <ul>
-        {results.map(s => (
-          <li key={s.id}>
-            {s.avatarUrl && <img src={s.avatarUrl} alt="avatar" width={40} style={{ verticalAlign: 'middle', marginRight: 8 }} />}
-            {s.name}（{s.admissionYear}年入学）
-          </li>
-        ))}
-      </ul>
     </div>
   );
-} 
+}
+
+const containerStyle: React.CSSProperties = {
+  background: '#fff',
+  borderRadius: 16,
+  boxShadow: '0 2px 8px #0001',
+  padding: '28px 20px 18px 20px',
+  marginBottom: 32,
+  width: '100%',
+  maxWidth: 1200,
+  marginLeft: 'auto',
+  marginRight: 'auto',
+};
+const formRowStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 18,
+  width: '100%',
+};
+const rowStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+};
+const inputGroupStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  background: '#fafbfc',
+  borderRadius: 24,
+  border: '1.5px solid #e5e7eb',
+  padding: '0 18px',
+  height: 44,
+  minWidth: 150,
+  maxWidth: 200,
+  flex: '1 1 160px',
+  boxSizing: 'border-box',
+};
+const iconStyle: React.CSSProperties = {
+  marginRight: 8,
+  display: 'flex',
+  alignItems: 'center',
+};
+const inputStyle: React.CSSProperties = {
+  border: 'none',
+  outline: 'none',
+  background: 'transparent',
+  fontSize: 15,
+  width: '100%',
+  height: 32,
+  padding: 0,
+};
+const selectStyle: React.CSSProperties = {
+  border: 'none',
+  outline: 'none',
+  background: 'transparent',
+  fontSize: 15,
+  width: '100%',
+  height: 32,
+  padding: 0,
+};
+const coursesGroupStyle: React.CSSProperties = {
+  background: '#fafbfc',
+  borderRadius: 24,
+  border: '1.5px solid #e5e7eb',
+  padding: '10px 18px',
+  minWidth: 220,
+  maxWidth: 900,
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: 6,
+};
+const coursesLabelStyle: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 600,
+  marginBottom: 2,
+};
+const coursesCheckboxesStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 14,
+  flexWrap: 'wrap',
+};
+const checkboxLabelStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+  fontSize: 14,
+  background: '#fff',
+  borderRadius: 12,
+  padding: '2px 8px',
+  border: '1px solid #e5e7eb',
+};
+const checkboxStyle: React.CSSProperties = {
+  accentColor: '#2a4d7a',
+  width: 16,
+  height: 16,
+  margin: 0,
+};
+const sortSelectStyle: React.CSSProperties = {
+  background: '#fafbfc',
+  border: '1.5px solid #e5e7eb',
+  borderRadius: 12,
+  padding: '8px 24px 8px 12px',
+  fontSize: 15,
+  fontWeight: 500,
+  color: '#222',
+  outline: 'none',
+  boxShadow: '0 1px 2px #0001',
+  appearance: 'none',
+  height: 44,
+  minWidth: 110,
+};
+const searchBtnStyle: React.CSSProperties = {
+  background: '#111',
+  color: '#fff',
+  border: 'none',
+  borderRadius: 20,
+  padding: '10px 28px',
+  fontWeight: 600,
+  fontSize: 16,
+  cursor: 'pointer',
+  marginLeft: 8,
+  height: 44,
+}; 
