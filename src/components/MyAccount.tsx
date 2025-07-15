@@ -187,7 +187,7 @@ export default function MyAccount() {
       </h2>
       <div style={{ textAlign: 'center', marginBottom: 18 }}>
         {profileImg && (
-          <img src={profileImg ?? ''} alt="avatar" width={80} height={80} style={{ borderRadius: '50%', border: '1.5px solid #bbb', objectFit: 'cover', marginBottom: 8 }} />
+          <img src={profileImg ?? ''} alt="avatar" width={80} height={80} style={{ borderRadius: '8px', border: '1.5px solid #bbb', objectFit: 'cover', marginBottom: 8 }} />
         )}
         <div style={{ fontWeight: 600 }}>{user.displayName || user.email}</div>
         <div style={{ color: '#888', fontSize: 13 }}>{user.email}</div>

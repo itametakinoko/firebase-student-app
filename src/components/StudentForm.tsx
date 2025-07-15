@@ -239,6 +239,14 @@ export default function StudentForm() {
             )}
             {showCropper && (
               <div style={{ position: 'relative', width: 260, height: 260, background: '#222', margin: '16px auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <style jsx>{`
+                  .reactEasyCrop__crop-area {
+                    border-radius: 0 !important;
+                  }
+                  .reactEasyCrop__image {
+                    border-radius: 0 !important;
+                  }
+                `}</style>
                 <Cropper
                   image={avatarUrl}
                   crop={crop}
@@ -249,6 +257,23 @@ export default function StudentForm() {
                   onCropChange={setCrop}
                   onZoomChange={setZoom}
                   onCropComplete={onCropComplete}
+                  style={{
+                    containerStyle: {
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#222',
+                    },
+                    cropAreaStyle: {
+                      border: '2px solid #fff',
+                      borderRadius: '0px',
+                    },
+                    mediaStyle: {
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '0px',
+                    },
+                  }}
                 />
               </div>
             )}
